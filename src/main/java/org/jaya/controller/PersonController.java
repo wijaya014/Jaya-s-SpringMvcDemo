@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -21,20 +22,34 @@ public class PersonController {
 		this.personService=ps;
 	}
 	
-	@RequestMapping(value="/persons", method=RequestMethod.GET)
+	@RequestMapping(value="/person", method=RequestMethod.GET)
 	public String listPerson(Model model){
 		model.addAttribute("person", new Person());
 		model.addAttribute("personList", this.personService.listPerson());
-		return "persons";
+		return "person";
 	}
 	
+	@RequestMapping(value="/person/add", method=RequestMethod.POST)
 	public String addPerson(@ModelAttribute("person") Person person){
 		if(person.getId() == 0 ){
 			this.personService.addPerson(person);
 		}else{
 			this.personService.updatePerson(person);
 		}
-		return "redirect:/persons";
+		return "redirect:/person";
+	}
+	
+	@RequestMapping(value="/remove/{id}")
+	public String removePerson(@PathVariable("id") int id){
+		this.personService.removePerson(id);
+		return "redirect:/person";
+	}
+	
+	@RequestMapping(value="/edit/{id}")
+	public String editPerson(@PathVariable("id") int id, Model model){
+		model.addAttribute("person",this.personService.getPersonById(id));
+		model.addAttribute("listPerson",this.personService.listPerson());
+		return "person";
 	}
 	
 	
